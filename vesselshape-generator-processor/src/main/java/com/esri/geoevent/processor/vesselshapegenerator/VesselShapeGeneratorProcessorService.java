@@ -23,6 +23,7 @@ package com.esri.geoevent.processor.vesselshapegenerator;
  */
 
 
+import com.esri.geoevent.processor.vesselshapegenerator.provider.Provider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -34,16 +35,26 @@ import com.esri.ges.processor.GeoEventProcessorServiceBase;
 
 public class VesselShapeGeneratorProcessorService extends GeoEventProcessorServiceBase {
 	public GeoEventDefinitionManager manager;
+  private Provider shapeProvider;
+  
 	private static final Log LOG = LogFactory
 			.getLog(VesselShapeGeneratorProcessorService.class);
 	public VesselShapeGeneratorProcessorService() throws PropertyException {
 		definition = new VesselShapeGeneratorProcessorDefinition();
 	}
 
+  public Provider getShapeProvider() {
+    return shapeProvider;
+  }
+
+  public void setShapeProvider(Provider shapeProvider) {
+    this.shapeProvider = shapeProvider;
+  }
+
 	@Override
 	public GeoEventProcessor create() {
 		try {
-			return new VesselShapeGeneratorProcessor(definition);
+			return new VesselShapeGeneratorProcessor(definition, shapeProvider);
 		} catch (ComponentException e) {
 			LOG.error("Rangefan processor");
 			LOG.error(e.getMessage());

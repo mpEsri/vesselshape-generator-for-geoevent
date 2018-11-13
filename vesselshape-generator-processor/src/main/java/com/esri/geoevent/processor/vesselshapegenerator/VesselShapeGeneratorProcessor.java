@@ -36,10 +36,12 @@ import com.esri.ges.core.validation.ValidationException;
 import com.esri.ges.processor.GeoEventProcessorBase;
 import com.esri.ges.processor.GeoEventProcessorDefinition;
 import com.esri.core.geometry.Geometry;
+import com.esri.geoevent.processor.vesselshapegenerator.provider.Provider;
 
 public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
 	private static final Log LOG = LogFactory.getLog(VesselShapeGeneratorProcessor.class);
 	//public GeoEventDefinitionManager manager;
+  private final Provider shapeProvider;
 	private SpatialReference srIn;
 	private SpatialReference srBuffer;
 	private SpatialReference srOut;
@@ -61,8 +63,9 @@ public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
 	private String xfield;
 	private String yfield;
 
-	public VesselShapeGeneratorProcessor(GeoEventProcessorDefinition definition) throws ComponentException {
+	public VesselShapeGeneratorProcessor(GeoEventProcessorDefinition definition, Provider shapeProvider) throws ComponentException {
 		super(definition);
+    this.shapeProvider = shapeProvider;
 	}
 
 	
