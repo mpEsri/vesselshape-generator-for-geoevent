@@ -3,7 +3,9 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
 	default-activation="lazy">
 	
-  <bean id="vesselShapeProviderBean" class="com.esri.geoevent.processor.vesselshapegenerator.provider.ResourceProvider">
+  <bean id="vesselShapeProviderBean" 
+        class="com.esri.geoevent.processor.vesselshapegenerator.provider.ResourceProvider"
+        init-method="init">
     <argument value="model/shapes.json"/>
   </bean>
   

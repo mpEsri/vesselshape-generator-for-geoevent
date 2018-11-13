@@ -216,7 +216,7 @@ public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
   
   private Shape getShape(GeoEvent ge) throws ProviderException {
     // TODO: implement reading finding a right shape by an attribute from ge
-    return shapeProvider.provide().get("default");
+    return shapeProvider.readShapes().get("default");
   }
 
 	private Geometry constructRangeFan(double x, double y, double range,

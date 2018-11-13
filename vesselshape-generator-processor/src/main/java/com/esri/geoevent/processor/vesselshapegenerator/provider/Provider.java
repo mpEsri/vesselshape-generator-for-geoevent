@@ -7,5 +7,5 @@ import java.util.Map;
  * Data provider.
  */
 public interface Provider {
-  Map<String, Shape> provide() throws ProviderException;
+  Map<String, Shape> readShapes() throws ProviderException;
 }
