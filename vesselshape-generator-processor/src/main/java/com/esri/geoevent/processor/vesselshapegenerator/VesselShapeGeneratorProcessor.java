@@ -36,7 +36,9 @@ import com.esri.ges.core.validation.ValidationException;
 import com.esri.ges.processor.GeoEventProcessorBase;
 import com.esri.ges.processor.GeoEventProcessorDefinition;
 import com.esri.core.geometry.Geometry;
+import com.esri.geoevent.processor.vesselshapegenerator.model.Shape;
 import com.esri.geoevent.processor.vesselshapegenerator.provider.Provider;
+import com.esri.geoevent.processor.vesselshapegenerator.provider.ProviderException;
 
 public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
 	private static final Log LOG = LogFactory.getLog(VesselShapeGeneratorProcessor.class);
@@ -199,7 +201,8 @@ public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
 			Point centerProj = (Point) GeometryEngine.project(originGeo, srIn,
 					srBuffer);
 
-			Geometry vesselShape = GeometryUtility.generateVesselShape(centerProj, 50.0, 200.0, bearing);
+      Shape shapeDefinition = getShape(ge);
+			Geometry vesselShape = GeometryUtility.generateVesselShape(centerProj, 50.0, 200.0, bearing, shapeDefinition);
 			
 			Geometry vesselShapeOut = GeometryEngine.project(vesselShape, srBuffer, srOut);			
 			MapGeometry outMapGeo = new MapGeometry(vesselShapeOut, srOut);
@@ -210,6 +213,11 @@ public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
 			throw e;
 		}
 	}
+  
+  private Shape getShape(GeoEvent ge) throws ProviderException {
+    // TODO: implement reading finding a right shape by an attribute from ge
+    return shapeProvider.provide().get("default");
+  }
 
 	private Geometry constructRangeFan(double x, double y, double range,
 			String unit, double bearing, double traversal) throws Exception {
