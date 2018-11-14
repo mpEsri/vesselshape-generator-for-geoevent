@@ -142,7 +142,7 @@ public class GeometryUtility {
     return line;	  
 	}
 
-	public static Polygon generateVesselShape0(Point center, double shipWidth, double shipLength, double headingDegrees)
+	public static Polygon _generateVesselShape(Point center, double shipWidth, double shipLength, double headingDegrees)
 	{
 		// this generate vessel shape pointing west at 0 degree.
 		// will need to make it point north first then rotate by heading
