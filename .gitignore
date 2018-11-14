@@ -25,6 +25,7 @@ vesselshape-generator-processor/.classpath
 vesselshape-generator-processor/.project
 *.prefs
 .project
-*.properties
 *.MF
 *.lst
+vesselshape-generator-processor/target/classes/com/esri/geoevent/processor/vesselshape-generator-processor.properties
+vesselshape-generator-processor/target/classes/com/esri/geoevent/processor/vesselshapegenerator-processor.properties

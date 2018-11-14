@@ -201,8 +201,11 @@ public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
 			Point centerProj = (Point) GeometryEngine.project(originGeo, srIn,
 					srBuffer);
 
+      double shipLength = range;
+			double shipWidth = traversal;
       Shape shapeDefinition = getShape(ge);
-			Geometry vesselShape = GeometryUtility.generateVesselShape(centerProj, 50.0, 200.0, bearing, shapeDefinition);
+      
+			Geometry vesselShape = GeometryUtility.generateVesselShape(centerProj, shipWidth, shipLength, bearing, shapeDefinition);
 			
 			Geometry vesselShapeOut = GeometryEngine.project(vesselShape, srBuffer, srOut);			
 			MapGeometry outMapGeo = new MapGeometry(vesselShapeOut, srOut);
