@@ -9,10 +9,17 @@
     <argument value="model/shapes.json"/>
   </bean>
   
+  <bean id="vesselShapeFolderBean" 
+        class="com.esri.geoevent.processor.vesselshapegenerator.provider.FolderProvider"
+        init-method="init"
+        destroy-method="destroy">
+    <argument value="model"/>
+  </bean>
+  
 	<bean id="vesselShapeGeneratorProcessorServiceBean"
 		class="com.esri.geoevent.processor.vesselshapegenerator.VesselShapeGeneratorProcessorService">
 		<property name="bundleContext" ref="blueprintBundleContext" />
-		<property name="shapeProvider" ref="vesselShapeProviderBean" />
+		<property name="shapeProvider" ref="vesselShapeFolderBean" />
 	</bean>
 	
 	<service id="vesselShapeGeneratorProcessorService" ref="vesselShapeGeneratorProcessorServiceBean"
