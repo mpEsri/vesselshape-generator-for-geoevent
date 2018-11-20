@@ -38,6 +38,7 @@ import com.esri.core.geometry.Geometry;
 import com.esri.geoevent.processor.vesselshapegenerator.model.Shape;
 import com.esri.geoevent.processor.vesselshapegenerator.provider.Provider;
 import com.esri.geoevent.processor.vesselshapegenerator.provider.ProviderException;
+import org.apache.commons.lang3.StringUtils;
 
 public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
 
@@ -64,6 +65,7 @@ public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
   private String geometryEventFld;
   private String xfield;
   private String yfield;
+  private String shapeField;
 
   public VesselShapeGeneratorProcessor(GeoEventProcessorDefinition definition, Provider shapeProvider) throws ComponentException {
     super(definition);
@@ -98,6 +100,7 @@ public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
       geometryEventFld = properties.get("geoeventfld").getValue().toString();
       xfield = properties.get("xfield").getValueAsString();
       yfield = properties.get("yfield").getValueAsString();
+      shapeField = properties.get("shapefield").getValueAsString();
     } catch (Exception e) {
       LOG.error(e.getMessage());
     }
@@ -207,8 +210,9 @@ public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
   }
 
   private Shape getShape(GeoEvent ge) throws ProviderException {
-    // TODO: implement reading finding a right shape by an attribute from ge
-    return shapeProvider.readShapes().get("default");
+    String shapeType = StringUtils.defaultIfBlank((String)ge.getField(shapeField), "default");
+    Shape shape = shapeProvider.readShapes().get(shapeType);
+    return shape!=null? shape: shapeProvider.readShapes().get("default");
   }
 
   private Geometry constructRangeFan(double x, double y, double range,

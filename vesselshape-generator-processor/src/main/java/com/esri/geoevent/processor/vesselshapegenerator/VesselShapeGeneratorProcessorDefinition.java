@@ -78,17 +78,13 @@ public class VesselShapeGeneratorProcessorDefinition extends
 					"${com.esri.geoevent.processor.vesselshape-generator-processor.DESC_Y_FIELD}", false, false);
 			procYField.setDependsOn("geosrc=coord");
 			propertyDefinitions.put(procYField.getPropertyName(), procYField);
-
-			List<LabeledValue> allowedShapes = new ArrayList<LabeledValue>();
-			allowedShapes.add(new
-			LabeledValue("${com.esri.geoevent.processor.vesselshape-generator-processor.SHP_DEFAULT}","default"));
       
-			PropertyDefinition procShape = new PropertyDefinition("shape",
+			PropertyDefinition procShape = new PropertyDefinition("shapefield",
 					PropertyType.String, 
-          "default", 
+          "shape", 
           "${com.esri.geoevent.processor.vesselshape-generator-processor.LBL_SHAPE}",
 					"${com.esri.geoevent.processor.vesselshape-generator-processor.DESC_SHAPE}", 
-          true, false, allowedShapes);
+          true, false);
 			propertyDefinitions.put(procShape.getPropertyName(), procShape);
 
 			List<LabeledValue> allowedSources = new ArrayList<LabeledValue>();
