@@ -60,8 +60,8 @@ public class VesselShapeGeneratorProcessorDefinition extends
 
 			PropertyDefinition procGeometryEventFld = new PropertyDefinition(
 					"geoeventfld", PropertyType.String, "Geometry",
-					"${com.esri.geoevent..processor.vesselshape-generator-processor.LBL_GEOMETRY_FIELD}",
-					"${com.esri.geoevent..processor.vesselshape-generator-processor.DESC_GEOMETRY_FIELD}", false,
+					"${com.esri.geoevent.processor.vesselshape-generator-processor.LBL_GEOMETRY_FIELD}",
+					"${com.esri.geoevent.processor.vesselshape-generator-processor.DESC_GEOMETRY_FIELD}", false,
 					false);
 			procGeometryEventFld.setDependsOn("geosrc=geodef");
 			propertyDefinitions.put(procGeometryEventFld.getPropertyName(),
