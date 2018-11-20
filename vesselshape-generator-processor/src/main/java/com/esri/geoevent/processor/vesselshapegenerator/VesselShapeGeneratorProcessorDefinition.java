@@ -79,6 +79,18 @@ public class VesselShapeGeneratorProcessorDefinition extends
 			procYField.setDependsOn("geosrc=coord");
 			propertyDefinitions.put(procYField.getPropertyName(), procYField);
 
+			List<LabeledValue> allowedShapes = new ArrayList<LabeledValue>();
+			allowedShapes.add(new
+			LabeledValue("${com.esri.geoevent.processor.vesselshape-generator-processor.SHP_DEFAULT}","default"));
+      
+			PropertyDefinition procShape = new PropertyDefinition("shape",
+					PropertyType.String, 
+          "default", 
+          "${com.esri.geoevent.processor.vesselshape-generator-processor.LBL_SHAPE}",
+					"${com.esri.geoevent.processor.vesselshape-generator-processor.DESC_SHAPE}", 
+          true, false, allowedShapes);
+			propertyDefinitions.put(procShape.getPropertyName(), procShape);
+
 			List<LabeledValue> allowedSources = new ArrayList<LabeledValue>();
 			allowedSources.add(new
 			LabeledValue("${com.esri.geoevent.processor.vesselshape-generator-processor.SRC_CONSTANT}","Constant"));
@@ -107,6 +119,31 @@ public class VesselShapeGeneratorProcessorDefinition extends
 			procRangeEvent.setDependsOn("rangeSource=Event");
 			propertyDefinitions.put(procRangeEvent.getPropertyName(),
 					procRangeEvent);
+
+			PropertyDefinition procTraversalSource = new PropertyDefinition(
+					"traversalSource",
+					PropertyType.String,
+					"${com.esri.geoevent.processor.vesselshape-generator-processor.SRC_CONSTANT}",
+					"${com.esri.geoevent.processor.vesselshape-generator-processor.LBL_TRAVERSAL_SRC}", "${com.esri.geoevent.processor.vesselshape-generator-processor.DESC_TRAVERSAL_SRC}", true,
+					false, allowedSources);
+			propertyDefinitions.put(procTraversalSource.getPropertyName(),
+					procTraversalSource);
+
+			PropertyDefinition procTraversal = new PropertyDefinition(
+					"traversal", PropertyType.Double, 30, "${com.esri.geoevent.processor.vesselshape-generator-processor.LBL_TRAVERSAL}",
+					"${com.esri.geoevent.processor.vesselshape-generator-processor.DESC_TRAVERSAL}", true, false);
+			procTraversal.setDependsOn("traversalSource=Constant");
+			propertyDefinitions.put(procTraversal.getPropertyName(),
+					procTraversal);
+
+			PropertyDefinition procTraversalEvent = new PropertyDefinition(
+					"traversalEvent", PropertyType.String, "traversal",
+					"${com.esri.geoevent.processor.vesselshape-generator-processor.LBL_TRAVERSAL_FIELD}",
+					"${com.esri.geoevent.processor.vesselshape-generator-processor.DESC_TRAVERSAL_FIELD}", true,
+					false);
+			procTraversalEvent.setDependsOn("traversalSource=Event");
+			propertyDefinitions.put(procTraversalEvent.getPropertyName(),
+					procTraversalEvent);
 
 			List<LabeledValue> unitsAllowedVals = new ArrayList<LabeledValue>();
 			unitsAllowedVals.add(new
@@ -149,31 +186,6 @@ public class VesselShapeGeneratorProcessorDefinition extends
 			procBearingEvent.setDependsOn("bearingSource=Event");
 			propertyDefinitions.put(procBearingEvent.getPropertyName(),
 					procBearingEvent);
-
-			PropertyDefinition procTraversalSource = new PropertyDefinition(
-					"traversalSource",
-					PropertyType.String,
-					"${com.esri.geoevent.processor.vesselshape-generator-processor.SRC_CONSTANT}",
-					"${com.esri.geoevent.processor.vesselshape-generator-processor.LBL_TRAVERSAL_SRC}", "${com.esri.geoevent.processor.vesselshape-generator-processor.DESC_TRAVERSAL_SRC}", true,
-					false, allowedSources);
-			propertyDefinitions.put(procTraversalSource.getPropertyName(),
-					procTraversalSource);
-
-			PropertyDefinition procTraversal = new PropertyDefinition(
-					"traversal", PropertyType.Double, 30, "${com.esri.geoevent.processor.vesselshape-generator-processor.LBL_TRAVERSAL}",
-					"${com.esri.geoevent.processor.vesselshape-generator-processor.DESC_TRAVERSAL}", true, false);
-			procTraversal.setDependsOn("traversalSource=Constant");
-			propertyDefinitions.put(procTraversal.getPropertyName(),
-					procTraversal);
-
-			PropertyDefinition procTraversalEvent = new PropertyDefinition(
-					"traversalEvent", PropertyType.String, "traversal",
-					"${com.esri.geoevent.processor.vesselshape-generator-processor.LBL_TRAVERSAL_FIELD}",
-					"${com.esri.geoevent.processor.vesselshape-generator-processor.DESC_TRAVERSAL_FIELD}", true,
-					false);
-			procTraversalEvent.setDependsOn("traversalSource=Event");
-			propertyDefinitions.put(procTraversalEvent.getPropertyName(),
-					procTraversalEvent);
 
 			PropertyDefinition procWKIDBuffer = new PropertyDefinition(
 					"wkidbuffer", PropertyType.Integer, 3857, "${com.esri.geoevent.processor.vesselshape-generator-processor.LBL_PROC_WKID}",
