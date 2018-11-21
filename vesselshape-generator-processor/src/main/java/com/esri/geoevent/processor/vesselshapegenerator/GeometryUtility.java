@@ -233,10 +233,22 @@ public class GeometryUtility {
 	    return polygon;
 	}
   
+  public static double calculateRation(Point center, double shipLength) {
+    Point pt = new Point(center.getX() + shipLength, center.getY());
+    Polyline centerline = drawLine(center, pt);
+    Geometry geom = centerline;
+    SpatialReference spatialReference = SpatialReference.create(102100);
+    LinearUnit unit = (LinearUnit)LinearUnit.create(LinearUnit.Code.METER);
+    double lineGeodesicLength = GeometryEngine.geodesicLength(geom, spatialReference, unit);
+    double ratio = shipLength / lineGeodesicLength;
+    return ratio;
+  }
+  
 	public static Polygon generateVesselShape(Point center, double shipWidth, double shipLength, double headingDegrees, Shape shape)
 	{
 		// this generate vessel shape pointing west at 0 degree.
 		// will need to make it point north first then rotate by heading
+    /*
 	    Point pt = new Point(center.getX() + shipLength, center.getY());
 	    Polyline centerline = drawLine(center, pt);
 	    Geometry geom = centerline;
@@ -245,6 +257,8 @@ public class GeometryUtility {
 	    
 	    double lineGeodesicLength = GeometryEngine.geodesicLength(geom, spatialReference, unit); //(centerline, "meters");  
 	    double ratio = shipLength / lineGeodesicLength;
+    */
+      double ratio = calculateRation(center, shipLength);
 	    Polygon polygon = new Polygon();
 	    ArrayList<Point2D> path = new ArrayList<Point2D>();
 	    double centerX = center.getX();
