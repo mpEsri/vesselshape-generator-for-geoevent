@@ -42,7 +42,10 @@ public class FolderProvider implements Provider {
   }
 
   public void init() {
-    folder = new File(System.getProperty("user.home"), path);
+    folder = new File(path);
+    if (!folder.isAbsolute()) {
+      folder = new File(System.getProperty("user.home"), path);
+    }
     try {
       setCache(scanFolder(folder));
       thread = new Thread(new FolderObserver(), "Folder observer");
@@ -96,7 +99,7 @@ public class FolderProvider implements Provider {
     public void run() {
       WatchKey key;
       try {
-        LOG.info(String.format("Watching %s folder for changes has started.", folder));
+        LOG.info(String.format("Watching %s folder vessel definitions has started.", folder));
         while (!Thread.currentThread().isInterrupted()) {
           key = watcher.take();
           for (WatchEvent<?> event : key.pollEvents()) {
