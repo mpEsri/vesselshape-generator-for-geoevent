@@ -93,31 +93,48 @@ public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
         return null;
       }
       Point originGeo = (Point)geo.getGeometry();
+      
+      // read vessel properties
       String vesselType = (String)ge.getField("VESSEL_TYPE");
       Double vesselBear = (Double)ge.getField("VESSEL_BEAR");
-      Double vesselBow = (Double)ge.getField("VESSEL_BOW");
-      Double vesselPort = (Double)ge.getField("VESSEL_PORT");
-      Double vesselStar = (Double)ge.getField("VESSEL_STAR");
-      Double vesselStern = (Double)ge.getField("VESSEL_STERN");
       
+      Double vesselBow = (Double)ge.getField("VESSEL_BOW");     // top
+      Double vesselStern = (Double)ge.getField("VESSEL_STERN"); // bottom
+      Double vesselPort = (Double)ge.getField("VESSEL_PORT");   // left
+      Double vesselStar = (Double)ge.getField("VESSEL_STAR");   // right
+      
+      // calculate vessel length and width
       double shipLength = vesselBow + vesselStern;
       double shipWidth = vesselPort + vesselStar;
       
+      // calculate necessary shift considering GPS location
       double xShift = shipWidth/2.0 - vesselPort;
       double yShift = shipLength/2.0 - vesselStern;
       
+      // calculate shiift considering vessel bearing
+      double vesselBearRad = vesselBear * Math.PI / 180.0;
+      double xShiftRot = xShift * Math.cos(-vesselBearRad) - yShift * Math.sin(-vesselBearRad);
+      double yShiftRot = xShift * Math.sin(-vesselBearRad) + yShift * Math.cos(-vesselBearRad);
+      
+      // calculate ratio
       SpatialReference srBuffer = SpatialReference.create(102100);
       SpatialReference srOut = SpatialReference.create(outwkid);
       Point centerProj = (Point) GeometryEngine.project(originGeo, srIn, srBuffer);
       double ratio = GeometryUtility.calculateRation(centerProj, shipLength);
-      centerProj.setXY(centerProj.getX() + (xShift * ratio), centerProj.getY() + (yShift * ratio));
       
+      // establish new vessel center
+      centerProj.setXY(centerProj.getX() + xShiftRot*ratio, centerProj.getY() + yShiftRot*ratio);
+      
+      // obtain vessel shape; use default if shape unavailable
       Shape shape = shapeProvider.readShapes().get(vesselType);
       if (shape==null) {
         shape = shapeProvider.readShapes().get("default");
       }
+      
+      // generate vessel shape
       Geometry vesselShape = GeometryUtility.generateVesselShape(centerProj, shipWidth, shipLength, vesselBear, shape);
 
+      // project and store vessel shape
       Geometry vesselShapeOut = GeometryEngine.project(vesselShape, srBuffer, srOut);
       MapGeometry outMapGeo = new MapGeometry(vesselShapeOut, srOut);
       ge.setGeometry(outMapGeo);
