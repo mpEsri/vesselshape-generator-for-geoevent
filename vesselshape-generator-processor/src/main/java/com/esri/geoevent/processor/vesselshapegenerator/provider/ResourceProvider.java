@@ -7,18 +7,19 @@ import java.io.InputStream;
 import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.BundleContext;
 
 /**
  * Resource provider.
- * @deprecated 
  */
-@Deprecated
 public class ResourceProvider implements Provider {
 	private static final Log LOG = LogFactory.getLog(ResourceProvider.class);
+  private final BundleContext bundleContext;
   private final String uri;
   private Map<String, Shape> cache;
 
-  public ResourceProvider(String uri) {
+  public ResourceProvider(BundleContext bundleContext, String uri) {
+    this.bundleContext = bundleContext;
     this.uri = uri;
   }
 
@@ -30,7 +31,7 @@ public class ResourceProvider implements Provider {
   }
   
   public void init() {
-    try (InputStream inputStream = ClassLoader.getSystemResourceAsStream(uri);) {
+    try (InputStream inputStream = bundleContext.getBundle().getEntry(uri).openStream();) {
       Parser parser = new Parser();
       cache = parser.parse(inputStream);
     } catch (IOException ex) {

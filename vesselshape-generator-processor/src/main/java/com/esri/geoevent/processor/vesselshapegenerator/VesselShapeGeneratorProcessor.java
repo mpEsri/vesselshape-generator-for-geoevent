@@ -35,17 +35,18 @@ import com.esri.ges.processor.GeoEventProcessorDefinition;
 import com.esri.core.geometry.Geometry;
 import com.esri.geoevent.processor.vesselshapegenerator.model.Shape;
 import com.esri.geoevent.processor.vesselshapegenerator.provider.Provider;
-import java.util.Arrays;
+import com.esri.geoevent.processor.vesselshapegenerator.provider.ProviderException;
+import java.util.List;
 
 public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
 
   private static final Log LOG = LogFactory.getLog(VesselShapeGeneratorProcessor.class);
-  private final Provider shapeProvider;
+  private final List<Provider> shapeProviders;
   private int outwkid;
 
-  public VesselShapeGeneratorProcessor(GeoEventProcessorDefinition definition, Provider shapeProvider) throws ComponentException {
+  public VesselShapeGeneratorProcessor(GeoEventProcessorDefinition definition, List<Provider> shapeProviders) throws ComponentException {
     super(definition);
-    this.shapeProvider = shapeProvider;
+    this.shapeProviders = shapeProviders;
   }
 
   @Override
@@ -126,9 +127,9 @@ public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
       centerProj.setXY(centerProj.getX() + xShiftRot*ratio, centerProj.getY() + yShiftRot*ratio);
       
       // obtain vessel shape; use default if shape unavailable
-      Shape shape = shapeProvider.readShapes().get(vesselType);
+      Shape shape = readShape(vesselType);
       if (shape==null) {
-        shape = shapeProvider.readShapes().get("default");
+        shape = readShape("default");
       }
       
       // generate vessel shape
@@ -144,5 +145,15 @@ public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
       LOG.error(e.getMessage());
       throw e;
     }
+  }
+  
+  private Shape readShape(String vesselType) throws ProviderException{
+    for (Provider sp : shapeProviders) {
+      Shape shape = sp.readShapes().get(vesselType);
+      if (shape!=null) {
+        return shape;
+      }
+    }
+    return null;
   }
 }

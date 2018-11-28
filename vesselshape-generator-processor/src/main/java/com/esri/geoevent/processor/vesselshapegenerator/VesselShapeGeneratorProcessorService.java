@@ -32,10 +32,11 @@ import com.esri.ges.core.property.PropertyException;
 import com.esri.ges.manager.geoeventdefinition.GeoEventDefinitionManager;
 import com.esri.ges.processor.GeoEventProcessor;
 import com.esri.ges.processor.GeoEventProcessorServiceBase;
+import java.util.List;
 
 public class VesselShapeGeneratorProcessorService extends GeoEventProcessorServiceBase {
 	public GeoEventDefinitionManager manager;
-  private Provider shapeProvider;
+  private List<Provider> shapeProviders;
   
 	private static final Log LOG = LogFactory
 			.getLog(VesselShapeGeneratorProcessorService.class);
@@ -43,18 +44,14 @@ public class VesselShapeGeneratorProcessorService extends GeoEventProcessorServi
 		definition = new VesselShapeGeneratorProcessorDefinition();
 	}
 
-  public Provider getShapeProvider() {
-    return shapeProvider;
-  }
-
-  public void setShapeProvider(Provider shapeProvider) {
-    this.shapeProvider = shapeProvider;
+  public void setShapeProviders(List<Provider> shapeProviders) {
+    this.shapeProviders = shapeProviders;
   }
 
 	@Override
 	public GeoEventProcessor create() {
 		try {
-			return new VesselShapeGeneratorProcessor(definition, shapeProvider);
+			return new VesselShapeGeneratorProcessor(definition, shapeProviders);
 		} catch (ComponentException e) {
 			LOG.error("Rangefan processor");
 			LOG.error(e.getMessage());

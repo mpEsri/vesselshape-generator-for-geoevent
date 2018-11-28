@@ -7,7 +7,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import static java.nio.file.StandardWatchEventKinds.*;
 import java.nio.file.WatchEvent;
