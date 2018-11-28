@@ -1,5 +1,7 @@
 package com.esri.geoevent.processor.vesselshapegenerator;
 
+import java.io.File;
+
 /*
  * #%L
  * Esri :: AGES :: Solutions :: Processor :: Geometry
@@ -36,6 +38,9 @@ public class VesselShapeGeneratorProcessorService extends GeoEventProcessorServi
 	public GeoEventDefinitionManager manager;
 	private static final Log LOG = LogFactory
 			.getLog(VesselShapeGeneratorProcessorService.class);
+
+	static File dataFolder;
+
 	public VesselShapeGeneratorProcessorService() throws PropertyException {
 		definition = new VesselShapeGeneratorProcessorDefinition();
 	}
@@ -55,6 +60,14 @@ public class VesselShapeGeneratorProcessorService extends GeoEventProcessorServi
 			LOG.error(e.getStackTrace());
 			return null;
 		}
-
 	}
+	
+  public void setDataFolder(File inDataFolder)
+  {
+    dataFolder = inDataFolder;
+    if (!dataFolder.exists())
+    {
+      dataFolder.mkdirs();
+    }
+  }
 }

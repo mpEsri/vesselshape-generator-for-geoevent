@@ -6,6 +6,7 @@
 	<bean id="vesselShapeGeneratorProcessorServiceBean"
 		class="com.esri.geoevent.processor.vesselshapegenerator.VesselShapeGeneratorProcessorService">
 		<property name="bundleContext" ref="blueprintBundleContext" />
+		<property name="dataFolder" value="${karaf.base}/data/vesselshapegenerator" />				
 	</bean>
 	
 	<service id="vesselShapeGeneratorProcessorService" ref="vesselShapeGeneratorProcessorServiceBean"

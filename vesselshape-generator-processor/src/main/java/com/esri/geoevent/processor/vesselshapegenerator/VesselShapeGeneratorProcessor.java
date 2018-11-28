@@ -1,5 +1,10 @@
 package com.esri.geoevent.processor.vesselshapegenerator;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
+
 /*
  * #%L
  * Esri :: AGES :: Solutions :: Processor :: Geometry
@@ -61,6 +66,8 @@ public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
 	private String xfield;
 	private String yfield;
 
+  private File vesselShapeParametersFile = null;
+	
 	public VesselShapeGeneratorProcessor(GeoEventProcessorDefinition definition) throws ComponentException {
 		super(definition);
 	}
@@ -102,7 +109,25 @@ public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
 		} catch (Exception e) {
 			LOG.error(e.getMessage());
 		}
-
+		
+    String filePath = VesselShapeGeneratorProcessorService.dataFolder.getPath() + "/" + "vesselshapeparams.json";
+//  if (vesselShapeParametersFile == null)
+//  {
+//    vesselShapeParametersFile = new File(filePath);
+//  }
+    if (vesselShapeParametersFile.exists())
+    {
+      LOG.info("Read vessel shape parameters from file...");
+      try
+      {
+        String json = FileUtils.readFileToString(vesselShapeParametersFile, "UTF-8");
+        //TODO: parse JSON for vessel shape parameters
+      }
+      catch (IOException e)
+      {
+        LOG.error(e.getMessage());
+      }
+    }
 	}
 
 	@Override
