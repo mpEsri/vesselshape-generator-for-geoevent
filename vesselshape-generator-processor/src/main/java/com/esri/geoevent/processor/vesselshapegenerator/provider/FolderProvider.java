@@ -14,6 +14,8 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -76,6 +78,10 @@ public class FolderProvider implements Provider {
   }
 
   private Map<String, Shape> readShapes(File file) throws IOException {
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException ex) {
+    }
     try (InputStream inputStream = new FileInputStream(file);) {
       return parser.parse(inputStream);
     }
