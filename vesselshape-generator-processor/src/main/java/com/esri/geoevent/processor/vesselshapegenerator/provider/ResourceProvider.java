@@ -10,7 +10,9 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Resource provider.
+ * @deprecated 
  */
+@Deprecated
 public class ResourceProvider implements Provider {
 	private static final Log LOG = LogFactory.getLog(ResourceProvider.class);
   private final String uri;
