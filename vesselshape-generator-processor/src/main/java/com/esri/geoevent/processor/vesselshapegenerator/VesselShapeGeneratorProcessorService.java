@@ -40,6 +40,7 @@ public class VesselShapeGeneratorProcessorService extends GeoEventProcessorServi
   
 	private static final Log LOG = LogFactory
 			.getLog(VesselShapeGeneratorProcessorService.class);
+
 	public VesselShapeGeneratorProcessorService() throws PropertyException {
 		definition = new VesselShapeGeneratorProcessorDefinition();
 	}
@@ -63,6 +64,5 @@ public class VesselShapeGeneratorProcessorService extends GeoEventProcessorServi
 			LOG.error(e.getStackTrace());
 			return null;
 		}
-
 	}
 }

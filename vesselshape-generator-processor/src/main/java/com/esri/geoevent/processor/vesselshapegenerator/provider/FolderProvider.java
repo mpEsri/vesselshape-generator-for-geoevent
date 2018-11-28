@@ -14,6 +14,7 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -25,14 +26,14 @@ public class FolderProvider implements Provider {
   private static final Log LOG = LogFactory.getLog(FolderProvider.class);
   private static final Parser parser = new Parser();
 
-  private final String path;
+  private final File path;
 
-  private File folder;
   private Map<String, Shape> cache;
   private Thread thread;
 
   public FolderProvider(String path) {
-    this.path = path;
+    this.path = new File(StrSubstitutor.replaceSystemProperties(path));
+    this.path.mkdirs();
   }
 
   @Override
@@ -41,16 +42,12 @@ public class FolderProvider implements Provider {
   }
 
   public void init() {
-    folder = new File(path);
-    if (!folder.isAbsolute()) {
-      folder = new File(System.getProperty("user.home"), path);
-    }
     try {
-      setCache(scanFolder(folder));
+      setCache(scanFolder(path));
       thread = new Thread(new FolderObserver(), "Folder observer");
       thread.start();
     } catch (IOException ex) {
-      LOG.error(String.format("Error scanning folder: %s", folder), ex);
+      LOG.error(String.format("Error scanning folder: %s", path), ex);
     }
   }
 
@@ -91,14 +88,14 @@ public class FolderProvider implements Provider {
 
     public FolderObserver() throws IOException {
       watcher = FileSystems.getDefault().newWatchService();
-      regKey = Paths.get(folder.toURI()).register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+      regKey = Paths.get(path.toURI()).register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
     }
 
     @Override
     public void run() {
       WatchKey key;
       try {
-        LOG.info(String.format("Watching %s folder vessel definitions has started.", folder));
+        LOG.info(String.format("Watching %s folder vessel definitions has started.", path));
         while (!Thread.currentThread().isInterrupted()) {
           key = watcher.take();
           for (WatchEvent<?> event : key.pollEvents()) {
@@ -107,9 +104,9 @@ public class FolderProvider implements Provider {
               continue;
             }
             try {
-              setCache(scanFolder(folder));
+              setCache(scanFolder(path));
             } catch (IOException ex) {
-              LOG.error(String.format("Error scanning folder: %s", folder), ex);
+              LOG.error(String.format("Error scanning folder: %s", path), ex);
             }
           }
           boolean valid = key.reset();
@@ -119,7 +116,7 @@ public class FolderProvider implements Provider {
         }
       } catch (InterruptedException x) {
       } finally {
-        LOG.info(String.format("Watching %s folder for changes has ended.", folder));
+        LOG.info(String.format("Watching %s folder for changes has ended.", path));
         regKey.reset();
         regKey = null;
       }
