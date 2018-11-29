@@ -28,15 +28,13 @@ import java.util.ArrayList;
 import com.esri.core.geometry.Geometry;
 import com.esri.core.geometry.GeometryEngine;
 import com.esri.core.geometry.LinearUnit;
-import com.esri.core.geometry.LinearUnitCode;
-import com.esri.core.geometry.MapGeometry;
 import com.esri.core.geometry.Point;
 import com.esri.core.geometry.Point2D;
 import com.esri.core.geometry.Polygon;
 import com.esri.core.geometry.Polyline;
 import com.esri.core.geometry.SpatialReference;
-import com.esri.core.geometry.Transformation2D;
-import com.esri.core.geometry.Unit;
+import com.esri.geoevent.processor.vesselshapegenerator.model.Factor;
+import com.esri.geoevent.processor.vesselshapegenerator.model.Shape;
 
 public class GeometryUtility {
 
@@ -230,6 +228,62 @@ public class GeometryUtility {
 	    
 	    Point2D[] points = new Point2D[path.size()];
 	    path.toArray(points);
+	    polygon.addPath(points, path.size(), true);
+	    polygon.closeAllPaths();
+	    return polygon;
+	}
+  
+  public static double calculateRation(Point center, double shipLength) {
+    Point pt = new Point(center.getX() + shipLength, center.getY());
+    Polyline centerline = drawLine(center, pt);
+    Geometry geom = centerline;
+    SpatialReference spatialReference = SpatialReference.create(102100);
+    LinearUnit unit = (LinearUnit)LinearUnit.create(LinearUnit.Code.METER);
+    double lineGeodesicLength = GeometryEngine.geodesicLength(geom, spatialReference, unit);
+    double ratio = shipLength / lineGeodesicLength;
+    return ratio;
+  }
+  
+	public static Polygon generateVesselShape(Point center, double shipWidth, double shipLength, double headingDegrees, Shape shape)
+	{
+		// this generate vessel shape pointing west at 0 degree.
+		// will need to make it point north first then rotate by heading
+    /*
+	    Point pt = new Point(center.getX() + shipLength, center.getY());
+	    Polyline centerline = drawLine(center, pt);
+	    Geometry geom = centerline;
+	    SpatialReference spatialReference = SpatialReference.create(102100);
+	    LinearUnit unit = (LinearUnit)LinearUnit.create(LinearUnit.Code.METER);
+	    
+	    double lineGeodesicLength = GeometryEngine.geodesicLength(geom, spatialReference, unit); //(centerline, "meters");  
+	    double ratio = shipLength / lineGeodesicLength;
+    */
+      double ratio = calculateRation(center, shipLength);
+	    Polygon polygon = new Polygon();
+	    ArrayList<Point2D> path = new ArrayList<Point2D>();
+	    double centerX = center.getX();
+	    double centerY = center.getY();
+	    
+	    double aHeading = GeometryUtility.Geo2Arithmetic(headingDegrees);
+	    double angleRadians = Math.toRadians(aHeading - 180); //add 90 degree to make it point east
+	    
+	    /////Top side
+	    final double positiveDir = 1.0;
+	    path.add(createVertex(shipWidth, shipLength, 1.0, centerX, centerY, angleRadians, 0.0, 0.0, positiveDir));  
+      for (Factor f: shape.topSide) {
+        path.add(createVertex(shipWidth, shipLength, ratio, centerX, centerY, angleRadians, f.x, f.y, positiveDir));    
+      }
+	
+	    ////// Bottom side
+	    final double negativeDir = -1.0;
+      for (Factor f: shape.bottomSide) {
+        path.add(createVertex(shipWidth, shipLength, ratio, centerX, centerY, angleRadians, f.x, f.y, negativeDir));    
+      }
+	    path.add(createVertex(shipWidth, shipLength, ratio, centerX, centerY, angleRadians, 0.0, 0.0, positiveDir));    
+    
+	    Point2D[] points = new Point2D[path.size()];
+	    path.toArray(points);
+
 	    polygon.addPath(points, path.size(), true);
 	    polygon.closeAllPaths();
 	    return polygon;

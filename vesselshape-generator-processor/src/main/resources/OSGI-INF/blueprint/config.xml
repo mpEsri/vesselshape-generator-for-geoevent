@@ -3,10 +3,31 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
 	default-activation="lazy">
 	
+  <bean id="vesselShapeProviderBean" 
+        class="com.esri.geoevent.processor.vesselshapegenerator.provider.ResourceProvider"
+        init-method="init">
+    <argument ref="blueprintBundleContext"/>
+    <argument value="model/shapes.json"/>
+  </bean>
+  
+  <bean id="vesselShapeFolderBean" 
+        class="com.esri.geoevent.processor.vesselshapegenerator.provider.FolderProvider"
+        init-method="init" 
+        destroy-method="destroy">
+    <argument value="${karaf.base}/data/vesselshapegenerator"/>
+    <property name="streamOpenAttempts" value="5" />
+    <property name="streamOpenDelay" value="500" />
+  </bean>
+  
 	<bean id="vesselShapeGeneratorProcessorServiceBean"
 		class="com.esri.geoevent.processor.vesselshapegenerator.VesselShapeGeneratorProcessorService">
 		<property name="bundleContext" ref="blueprintBundleContext" />
-		<property name="dataFolder" value="${karaf.base}/data/vesselshapegenerator" />				
+    <property name="shapeProviders">
+      <list>
+        <ref component-id="vesselShapeFolderBean"/>
+        <ref component-id="vesselShapeProviderBean"/>
+      </list>
+    </property>
 	</bean>
 	
 	<service id="vesselShapeGeneratorProcessorService" ref="vesselShapeGeneratorProcessorServiceBean"

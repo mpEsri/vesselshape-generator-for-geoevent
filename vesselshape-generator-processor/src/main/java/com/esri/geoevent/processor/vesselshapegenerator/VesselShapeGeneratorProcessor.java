@@ -1,9 +1,5 @@
 package com.esri.geoevent.processor.vesselshapegenerator;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.apache.commons.io.FileUtils;
 
 /*
  * #%L
@@ -26,248 +22,139 @@ import org.apache.commons.io.FileUtils;
  * limitations under the License.
  * #L%
  */
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.esri.core.geometry.GeometryEngine;
 import com.esri.core.geometry.MapGeometry;
 import com.esri.core.geometry.Point;
-import com.esri.core.geometry.Polygon;
 import com.esri.core.geometry.SpatialReference;
 import com.esri.ges.core.component.ComponentException;
 import com.esri.ges.core.geoevent.GeoEvent;
-import com.esri.ges.core.validation.ValidationException;
 import com.esri.ges.processor.GeoEventProcessorBase;
 import com.esri.ges.processor.GeoEventProcessorDefinition;
 import com.esri.core.geometry.Geometry;
+import com.esri.geoevent.processor.vesselshapegenerator.model.Shape;
+import com.esri.geoevent.processor.vesselshapegenerator.provider.Provider;
+import com.esri.geoevent.processor.vesselshapegenerator.provider.ProviderException;
+import java.util.List;
 
 public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
-	private static final Log LOG = LogFactory.getLog(VesselShapeGeneratorProcessor.class);
-	//public GeoEventDefinitionManager manager;
-	private SpatialReference srIn;
-	private SpatialReference srBuffer;
-	private SpatialReference srOut;
-	private String rangeSource;
-	private double rangeConstant;
-	private String rangeEventFld;
-	private String rangeUnits;
-	private String bearingSource;
-	private double bearingConstant;
-	private String bearingEventFld;
-	private String traversalSource;
-	private double traversalConstant;
-	private String traversalEventFld;
-	private int inwkid;
-	private int outwkid;
-	private int bufferwkid;
-	private String geosrc = "";
-	private String geometryEventFld;
-	private String xfield;
-	private String yfield;
 
-  private File vesselShapeParametersFile = null;
-	
-	public VesselShapeGeneratorProcessor(GeoEventProcessorDefinition definition) throws ComponentException {
-		super(definition);
-	}
+  private static final Log LOG = LogFactory.getLog(VesselShapeGeneratorProcessor.class);
+  private final List<Provider> shapeProviders;
+  private int outwkid;
 
-	
-	@Override
-	public boolean isGeoEventMutator() {
-		return true;
-	}
+  public VesselShapeGeneratorProcessor(GeoEventProcessorDefinition definition, List<Provider> shapeProviders) throws ComponentException {
+    super(definition);
+    this.shapeProviders = shapeProviders;
+  }
 
-	@Override
-	public void afterPropertiesSet() {
-		try {
-			rangeSource = properties.get("rangeSource").getValue().toString();
-			rangeConstant = (Double) properties.get("range").getValue();
-			rangeEventFld = properties.get("rangeEvent").getValue().toString();
-			rangeUnits = properties.get("units").getValue().toString();
+  @Override
+  public boolean isGeoEventMutator() {
+    return true;
+  }
 
-			bearingSource = properties.get("bearingSource").getValue()
-					.toString();
-			bearingConstant = (Double) properties.get("bearing").getValue();
-			bearingEventFld = properties.get("bearingEvent").getValue()
-					.toString();
+  @Override
+  public void afterPropertiesSet() {
+    try {
+      outwkid = (Integer) properties.get("wkidout").getValue();
+    } catch (Exception e) {
+      LOG.error(e.getMessage());
+    }
+  }
 
-			traversalSource = properties.get("traversalSource").getValue()
-					.toString();
-			traversalConstant = (Double) properties.get("traversal").getValue();
-			traversalEventFld = properties.get("traversalEvent").getValue()
-					.toString();
-			//inwkid = (Integer) properties.get("wkidin").getValue();
-			outwkid = (Integer) properties.get("wkidout").getValue();
-			bufferwkid = (Integer) properties.get("wkidbuffer").getValue();
-
-			geosrc = properties.get("geosrc").getValueAsString();
-			geometryEventFld = properties.get("geoeventfld").getValue()
-					.toString();
-			xfield = properties.get("xfield").getValueAsString();
-			yfield = properties.get("yfield").getValueAsString();
-		} catch (Exception e) {
-			LOG.error(e.getMessage());
-		}
-		
-    String filePath = VesselShapeGeneratorProcessorService.dataFolder.getPath() + "/" + "vesselshapeparams.json";
-//  if (vesselShapeParametersFile == null)
-//  {
-//    vesselShapeParametersFile = new File(filePath);
-//  }
-    if (vesselShapeParametersFile.exists())
-    {
-      LOG.info("Read vessel shape parameters from file...");
-      try
-      {
-        String json = FileUtils.readFileToString(vesselShapeParametersFile, "UTF-8");
-        //TODO: parse JSON for vessel shape parameters
-      }
-      catch (IOException e)
-      {
-        LOG.error(e.getMessage());
+  private boolean hasTag(GeoEvent ge, String tagName) {
+    return ge.getGeoEventDefinition().getTagNames().contains("GEOMETRY");
+  }
+  
+  private boolean hasAllTags(GeoEvent ge, String ... tagNames) {
+    for (String tagName: tagNames) {
+      if (!hasTag(ge, tagName)) {
+        return false;
       }
     }
-	}
+    return true;
+  }
+  
+  private boolean validate(GeoEvent ge) {
+    return true;
+  }
+  
+  @Override
+  public GeoEvent process(GeoEvent ge) throws Exception {
 
-	@Override
-	public void validate() throws ValidationException {
-		super.validate();
+    try {
+      if (!hasAllTags(ge, "GEOMETRY", "TRACK_ID", "VESSEL_TYPE", "VESSEL_BEAR", "VESSEL_BOW", "VESSEL_PORT", "VESSEL_STAR", "VESSEL_STERN")) {
+        return null;
+      }
+      
+      MapGeometry geo = ge.getGeometry();
+      SpatialReference srIn = geo.getSpatialReference();
+      if (!(geo.getGeometry() instanceof Point)) {
+        return null;
+      }
+      Point originGeo = (Point)geo.getGeometry();
+      
+      // read vessel properties
+      String vesselType = (String)ge.getField("VESSEL_TYPE");
+      Double vesselBear = (Double)ge.getField("VESSEL_BEAR");
+      
+      Double vesselBow = (Double)ge.getField("VESSEL_BOW");     // top
+      Double vesselStern = (Double)ge.getField("VESSEL_STERN"); // bottom
+      Double vesselPort = (Double)ge.getField("VESSEL_PORT");   // left
+      Double vesselStar = (Double)ge.getField("VESSEL_STAR");   // right
+      
+      // calculate vessel length and width
+      double shipLength = vesselBow + vesselStern;
+      double shipWidth = vesselPort + vesselStar;
+      
+      // calculate necessary shift considering GPS location
+      double xShift = shipWidth/2.0 - vesselPort;
+      double yShift = shipLength/2.0 - vesselStern;
+      
+      // calculate shiift considering vessel bearing
+      double vesselBearRad = vesselBear * Math.PI / 180.0;
+      double xShiftRot = xShift * Math.cos(-vesselBearRad) - yShift * Math.sin(-vesselBearRad);
+      double yShiftRot = xShift * Math.sin(-vesselBearRad) + yShift * Math.cos(-vesselBearRad);
+      
+      // calculate ratio
+      SpatialReference srBuffer = SpatialReference.create(102100);
+      SpatialReference srOut = SpatialReference.create(outwkid);
+      Point centerProj = (Point) GeometryEngine.project(originGeo, srIn, srBuffer);
+      double ratio = GeometryUtility.calculateRation(centerProj, shipLength);
+      
+      // establish new vessel center
+      centerProj.setXY(centerProj.getX() + xShiftRot*ratio, centerProj.getY() + yShiftRot*ratio);
+      
+      // obtain vessel shape; use default if shape unavailable
+      Shape shape = readShape(vesselType);
+      if (shape==null) {
+        shape = readShape("default");
+      }
+      
+      // generate vessel shape
+      Geometry vesselShape = GeometryUtility.generateVesselShape(centerProj, shipWidth, shipLength, vesselBear, shape);
 
-		if (rangeConstant <= 0) {
-			throw new ValidationException(
-					"A constant range must be greater than 0");
-		}
-
-		if (bearingConstant < 0 || bearingConstant >= 360) {
-			throw new ValidationException(
-					"A constant bearing must be >= 0 and < 360");
-		}
-
-		if (traversalConstant < 0 || bearingConstant >= 360) {
-			throw new ValidationException(
-					"A constant traversal must be > 0 and < 360");
-		}
-
-		
-
-		try {
-			srBuffer = SpatialReference.create(bufferwkid);
-		} catch (Exception e) {
-			throw new ValidationException(
-					"The spatial processing wkid is invalid");
-		}
-
-		try {
-			srOut = SpatialReference.create(outwkid);
-		} catch (Exception e) {
-			throw new ValidationException("The output wkid is invalid");
-		}
-	}
-
-	@Override
-	public GeoEvent process(GeoEvent ge) throws Exception {
-
-		try {
-			if(!ge.getGeoEventDefinition().getTagNames().contains("GEOMETRY"))
-			{
-				return null;
-			}
-			srIn=ge.getGeometry().getSpatialReference();	
-			inwkid = srIn.getID();
-			double range;
-			if (rangeSource.equals("Constant")) {
-				range = rangeConstant;
-			} else {
-				range = (Double) ge.getField(rangeEventFld);
-			}
-
-			double bearing;
-
-			if (bearingSource.equals("Constant")) {
-				bearing = bearingConstant;
-			} else {
-				bearing = (Double) ge.getField(bearingEventFld);
-			}
-
-			double traversal;
-
-			if (traversalSource.equals("Constant")) {
-				traversal = traversalConstant;
-			} else {
-				traversal = (Double) ge.getField(traversalEventFld);
-			}
-
-			Point originGeo = null;
-			if (geosrc.equals("event")) {
-				MapGeometry mapGeo = ge.getGeometry();
-				originGeo = (Point) mapGeo.getGeometry();
-			}
-			if (geosrc.equals("geodef")) {
-				originGeo = (Point) ge.getField(geometryEventFld);
-			}
-			if (geosrc.equals("coord")) {
-				Double ox = (Double) ge.getField(xfield);
-				Double oy = (Double) ge.getField(yfield);
-				originGeo = new Point(ox, oy, inwkid);
-			}
-			double x = originGeo.getX();
-			double y = originGeo.getY();
-			
-			//Geometry vesselShape = constructRangeFan(x, y, range, rangeUnits, bearing,
-			//		traversal);
-
-			
-			Point centerProj = (Point) GeometryEngine.project(originGeo, srIn,
-					srBuffer);
-
-			double shipLength = range;
-			double shipWidth = traversal;
-			
-			Geometry vesselShape = GeometryUtility.generateVesselShape(centerProj, shipWidth, shipLength, bearing);
-			
-			Geometry vesselShapeOut = GeometryEngine.project(vesselShape, srBuffer, srOut);			
-			MapGeometry outMapGeo = new MapGeometry(vesselShapeOut, srOut);
-			ge.setGeometry(outMapGeo);
-			return ge;
-		} catch (Exception e) {
-			LOG.error(e.getMessage());
-			throw e;
-		}
-	}
-
-	private Geometry constructRangeFan(double x, double y, double range,
-			String unit, double bearing, double traversal) throws Exception {
-		try {
-			Polygon fan = new Polygon();
-			Point center = new Point();
-			center.setX(x);
-			center.setY(y);
-
-			Point centerProj = (Point) GeometryEngine.project(center, srIn,
-					srBuffer);
-
-			double centerX = centerProj.getX();
-			double centerY = centerProj.getY();
-			bearing = GeometryUtility.Geo2Arithmetic(bearing);
-			double leftAngle = bearing - (traversal / 2);
-			double rightAngle = bearing + (traversal / 2);
-			int count = (int) Math.round(Math.abs(leftAngle - rightAngle));
-			fan.startPath(centerProj);
-			UnitConverter uc = new UnitConverter();
-			range = uc.Convert(range, unit, srBuffer);
-			for (int i = 0; i < count; ++i) {
-				double d = Math.toRadians(leftAngle + i);
-				double arcX = centerX + (range * Math.cos(d));
-				double arcY = centerY + (range * Math.sin(d));
-				Point arcPt = new Point(arcX, arcY);
-				fan.lineTo(arcPt);
-			}
-			fan.closeAllPaths();
-			return fan;
-		} catch (Exception e) {
-			LOG.error(e.getMessage());
-			throw e;
-		}
-	}
+      // project and store vessel shape
+      Geometry vesselShapeOut = GeometryEngine.project(vesselShape, srBuffer, srOut);
+      MapGeometry outMapGeo = new MapGeometry(vesselShapeOut, srOut);
+      ge.setGeometry(outMapGeo);
+      
+      return ge;
+    } catch (Exception e) {
+      LOG.error(e.getMessage());
+      throw e;
+    }
+  }
+  
+  private Shape readShape(String vesselType) throws ProviderException{
+    for (Provider sp : shapeProviders) {
+      Shape shape = sp.readShapes().get(vesselType);
+      if (shape!=null) {
+        return shape;
+      }
+    }
+    return null;
+  }
 }

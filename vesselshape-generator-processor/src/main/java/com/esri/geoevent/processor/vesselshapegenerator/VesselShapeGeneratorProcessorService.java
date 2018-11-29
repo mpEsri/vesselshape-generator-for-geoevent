@@ -1,7 +1,5 @@
 package com.esri.geoevent.processor.vesselshapegenerator;
 
-import java.io.File;
-
 /*
  * #%L
  * Esri :: AGES :: Solutions :: Processor :: Geometry
@@ -25,6 +23,7 @@ import java.io.File;
  */
 
 
+import com.esri.geoevent.processor.vesselshapegenerator.provider.Provider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -33,22 +32,27 @@ import com.esri.ges.core.property.PropertyException;
 import com.esri.ges.manager.geoeventdefinition.GeoEventDefinitionManager;
 import com.esri.ges.processor.GeoEventProcessor;
 import com.esri.ges.processor.GeoEventProcessorServiceBase;
+import java.util.List;
 
 public class VesselShapeGeneratorProcessorService extends GeoEventProcessorServiceBase {
 	public GeoEventDefinitionManager manager;
+  private List<Provider> shapeProviders;
+  
 	private static final Log LOG = LogFactory
 			.getLog(VesselShapeGeneratorProcessorService.class);
-
-	static File dataFolder;
 
 	public VesselShapeGeneratorProcessorService() throws PropertyException {
 		definition = new VesselShapeGeneratorProcessorDefinition();
 	}
 
+  public void setShapeProviders(List<Provider> shapeProviders) {
+    this.shapeProviders = shapeProviders;
+  }
+
 	@Override
 	public GeoEventProcessor create() {
 		try {
-			return new VesselShapeGeneratorProcessor(definition);
+			return new VesselShapeGeneratorProcessor(definition, shapeProviders);
 		} catch (ComponentException e) {
 			LOG.error("Rangefan processor");
 			LOG.error(e.getMessage());
@@ -61,13 +65,4 @@ public class VesselShapeGeneratorProcessorService extends GeoEventProcessorServi
 			return null;
 		}
 	}
-	
-  public void setDataFolder(File inDataFolder)
-  {
-    dataFolder = inDataFolder;
-    if (!dataFolder.exists())
-    {
-      dataFolder.mkdirs();
-    }
-  }
 }
