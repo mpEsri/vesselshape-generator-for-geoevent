@@ -64,7 +64,7 @@ public class VesselShapeGeneratorProcessorDefinition extends
 			topLevelFields.add(new DefaultFieldDefinition("Timestamp", FieldType.Date, "TIME_START"));
 			topLevelFields.add(new DefaultFieldDefinition("Name", FieldType.String, "VESSEL_NAME"));
 			topLevelFields.add(new DefaultFieldDefinition("ShipType", FieldType.Integer, "VESSEL_TYPE"));
-			topLevelFields.add(new DefaultFieldDefinition("TrueHeading", FieldType.Integer, "VESSEL_BEARING"));
+			topLevelFields.add(new DefaultFieldDefinition("TrueHeading", FieldType.Double, "VESSEL_BEARING"));
 			topLevelFields.add(new DefaultFieldDefinition("DimBow", FieldType.Integer, "VESSEL_BOW"));
 			topLevelFields.add(new DefaultFieldDefinition("DimPort", FieldType.Integer, "VESSEL_PORT"));
 			topLevelFields.add(new DefaultFieldDefinition("DimStarboard", FieldType.Integer, "VESSEL_STARBOARD"));
