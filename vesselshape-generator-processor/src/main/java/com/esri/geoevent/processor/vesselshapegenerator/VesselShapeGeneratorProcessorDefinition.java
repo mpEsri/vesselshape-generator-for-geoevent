@@ -49,7 +49,7 @@ public class VesselShapeGeneratorProcessorDefinition extends
 		try {
 
 			PropertyDefinition procWKIDOut = new PropertyDefinition("wkidout",
-					PropertyType.Integer, 4326, "${com.esri.geoevent.processor.vesselshape-generator-processor.LBL_OUTPUT_WKID}",
+					PropertyType.Integer, 102100, "${com.esri.geoevent.processor.vesselshape-generator-processor.LBL_OUTPUT_WKID}",
 					"${com.esri.geoevent.processor.vesselshape-generator-processor.DESC_OUTPUT_WKID}", true, false);
 			propertyDefinitions.put(procWKIDOut.getPropertyName(), procWKIDOut);
       
