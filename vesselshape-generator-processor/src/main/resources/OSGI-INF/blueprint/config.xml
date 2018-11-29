@@ -7,7 +7,7 @@
         class="com.esri.geoevent.processor.vesselshapegenerator.provider.ResourceProvider"
         init-method="init">
     <argument ref="blueprintBundleContext"/>
-    <argument value="model/shapes.json"/>
+    <argument value="model/default.json"/>
   </bean>
   
   <bean id="vesselShapeFolderBean" 
