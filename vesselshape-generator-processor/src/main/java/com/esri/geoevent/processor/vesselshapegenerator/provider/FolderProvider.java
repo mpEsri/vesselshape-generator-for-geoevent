@@ -14,8 +14,6 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,6 +27,8 @@ public class FolderProvider implements Provider {
   private static final Parser parser = new Parser();
 
   private final File path;
+  private int streamOpenDelay = 500;   // default: 500 ms
+  private int streamOpenAttempts = 5;  // default: 5 attempts
 
   private Map<String, Shape> cache;
   private Thread thread;
@@ -41,6 +41,14 @@ public class FolderProvider implements Provider {
   @Override
   public Map<String, Shape> readShapes() throws ProviderException {
     return getCache();
+  }
+
+  public void setStreamOpenDelay(int streamOpenDelay) {
+    this.streamOpenDelay = streamOpenDelay;
+  }
+
+  public void setStreamOpenAttempts(int streamOpenAttempts) {
+    this.streamOpenAttempts = streamOpenAttempts;
   }
 
   public void init() {
@@ -71,20 +79,41 @@ public class FolderProvider implements Provider {
     Map<String, Shape> shapes = new HashMap<>();
     for (File file : root.listFiles()) {
       if (file.getName().toLowerCase().endsWith(".json")) {
-        shapes.putAll(readShapes(file));
+        Map<String, Shape> shapesFromFile = readShapes(file);
+        if (shapesFromFile!=null) {
+          shapes.putAll(shapesFromFile);
+        }
       }
     }
     return shapes;
   }
 
   private Map<String, Shape> readShapes(File file) throws IOException {
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException ex) {
+    try (InputStream inputStream = openStream(file);) {
+      if (inputStream != null) {
+        return parser.parse(inputStream);
+      } else {
+        return null;
+      }
     }
-    try (InputStream inputStream = new FileInputStream(file);) {
-      return parser.parse(inputStream);
+  }
+  
+  private InputStream openStream(File file) throws IOException {
+    for (int attempt = 0; attempt < streamOpenAttempts; attempt++) {
+      try {
+        return new FileInputStream(file);
+      } catch (IOException ex) {
+        // ignore and try again
+      }
+      // wait a while till next attempt
+      try {
+        Thread.sleep(streamOpenDelay);
+      } catch (InterruptedException ex) {
+        // thread (or process) is closed; just exit
+        return null;
+      }
     }
+    return null;
   }
 
   private class FolderObserver implements Runnable {

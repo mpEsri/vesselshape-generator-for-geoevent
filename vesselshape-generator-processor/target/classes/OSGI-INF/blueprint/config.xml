@@ -14,7 +14,9 @@
         class="com.esri.geoevent.processor.vesselshapegenerator.provider.FolderProvider"
         init-method="init" 
         destroy-method="destroy">
-    <argument value="model"/>
+    <argument value="${karaf.base}/data/vesselshapegenerator"/>
+    <property name="streamOpenAttempts" value="5" />
+    <property name="streamOpenDelay" value="500" />
   </bean>
   
 	<bean id="vesselShapeGeneratorProcessorServiceBean"
