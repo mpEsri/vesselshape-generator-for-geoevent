@@ -7,6 +7,6 @@ import java.util.List;
  */
 public final class Shape {
   public String type;
-  public List<Factor> topSide;
-  public List<Factor> bottomSide;
+  public List<Factor> starboardSide;
+  public List<Factor> portSide;
 }

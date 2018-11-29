@@ -270,13 +270,13 @@ public class GeometryUtility {
 	    /////Top side
 	    final double positiveDir = 1.0;
 	    path.add(createVertex(shipWidth, shipLength, 1.0, centerX, centerY, angleRadians, 0.0, 0.0, positiveDir));  
-      for (Factor f: shape.topSide) {
+      for (Factor f: shape.starboardSide) {
         path.add(createVertex(shipWidth, shipLength, ratio, centerX, centerY, angleRadians, f.x, f.y, positiveDir));    
       }
 	
 	    ////// Bottom side
 	    final double negativeDir = -1.0;
-      for (Factor f: shape.bottomSide) {
+      for (Factor f: shape.portSide) {
         path.add(createVertex(shipWidth, shipLength, ratio, centerX, centerY, angleRadians, f.x, f.y, negativeDir));    
       }
 	    path.add(createVertex(shipWidth, shipLength, ratio, centerX, centerY, angleRadians, 0.0, 0.0, positiveDir));    

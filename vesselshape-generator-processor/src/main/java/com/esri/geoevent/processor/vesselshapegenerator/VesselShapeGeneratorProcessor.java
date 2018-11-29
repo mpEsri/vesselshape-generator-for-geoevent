@@ -85,7 +85,7 @@ public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
   public GeoEvent process(GeoEvent ge) throws Exception {
 
     try {
-      if (!hasAllTags(ge, "GEOMETRY", "TRACK_ID", "VESSEL_TYPE", "VESSEL_BEAR", "VESSEL_BOW", "VESSEL_PORT", "VESSEL_STAR", "VESSEL_STERN")) {
+      if (!hasAllTags(ge, "GEOMETRY", "TRACK_ID", "VESSEL_TYPE", "VESSEL_BEARING", "VESSEL_BOW", "VESSEL_PORT", "VESSEL_STARBOARD", "VESSEL_STERN")) {
         return null;
       }
       
@@ -97,13 +97,13 @@ public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
       Point originGeo = (Point)geo.getGeometry();
       
       // read vessel properties
-      String vesselType = (String)ge.getField("VESSEL_TYPE");
-      Double vesselBear = (Double)ge.getField("VESSEL_BEAR");
+      String vesselType = ge.getField("VESSEL_TYPE")!=null? ge.getField("VESSEL_TYPE").toString(): null;
+      Double vesselBear = ge.getField("VESSEL_BEARING") instanceof Number? ((Number)ge.getField("VESSEL_BEARING")).doubleValue(): null;
       
-      Double vesselBow = (Double)ge.getField("VESSEL_BOW");     // top
-      Double vesselStern = (Double)ge.getField("VESSEL_STERN"); // bottom
-      Double vesselPort = (Double)ge.getField("VESSEL_PORT");   // left
-      Double vesselStar = (Double)ge.getField("VESSEL_STAR");   // right
+      Double vesselBow   = ge.getField("VESSEL_BOW") instanceof Number? ((Number)ge.getField("VESSEL_BOW")).doubleValue(): null;               // top
+      Double vesselStern = ge.getField("VESSEL_STERN") instanceof Number? ((Number)ge.getField("VESSEL_STERN")).doubleValue(): null;           // bottom
+      Double vesselPort  = ge.getField("VESSEL_PORT") instanceof Number? ((Number)ge.getField("VESSEL_PORT")).doubleValue(): null;             // left
+      Double vesselStar  = ge.getField("VESSEL_STARBOARD") instanceof Number? ((Number)ge.getField("VESSEL_STARBOARD")).doubleValue(): null;   // right
       
       // calculate vessel length and width
       double shipLength = vesselBow + vesselStern;
@@ -130,7 +130,7 @@ public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
       // obtain vessel shape; use default if shape unavailable
       Shape shape = readShape(vesselType);
       if (shape==null) {
-        shape = readShape("default");
+        shape = readShape("0");
       }
       
       // generate vessel shape

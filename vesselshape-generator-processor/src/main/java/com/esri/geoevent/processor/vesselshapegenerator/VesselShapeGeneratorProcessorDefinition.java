@@ -63,12 +63,12 @@ public class VesselShapeGeneratorProcessorDefinition extends
 			topLevelFields.add(new DefaultFieldDefinition("shape", FieldType.Geometry, "GEOMETRY"));
 			topLevelFields.add(new DefaultFieldDefinition("Timestamp", FieldType.Date, "TIME_START"));
 			topLevelFields.add(new DefaultFieldDefinition("Name", FieldType.String, "VESSEL_NAME"));
-			topLevelFields.add(new DefaultFieldDefinition("ShipType", FieldType.String, "VESSEL_TYPE"));
-			topLevelFields.add(new DefaultFieldDefinition("TrueHeading", FieldType.Double, "VESSEL_BEAR"));
-			topLevelFields.add(new DefaultFieldDefinition("DimBow", FieldType.Double, "VESSEL_BOW"));
-			topLevelFields.add(new DefaultFieldDefinition("DimPort", FieldType.Double, "VESSEL_PORT"));
-			topLevelFields.add(new DefaultFieldDefinition("DimStarboard", FieldType.Double, "VESSEL_STAR"));
-			topLevelFields.add(new DefaultFieldDefinition("DimStern", FieldType.Double, "VESSEL_STERN"));
+			topLevelFields.add(new DefaultFieldDefinition("ShipType", FieldType.Integer, "VESSEL_TYPE"));
+			topLevelFields.add(new DefaultFieldDefinition("TrueHeading", FieldType.Integer, "VESSEL_BEARING"));
+			topLevelFields.add(new DefaultFieldDefinition("DimBow", FieldType.Integer, "VESSEL_BOW"));
+			topLevelFields.add(new DefaultFieldDefinition("DimPort", FieldType.Integer, "VESSEL_PORT"));
+			topLevelFields.add(new DefaultFieldDefinition("DimStarboard", FieldType.Integer, "VESSEL_STARBOARD"));
+			topLevelFields.add(new DefaultFieldDefinition("DimStern", FieldType.Integer, "VESSEL_STERN"));
       
       def.setFieldDefinitions(topLevelFields);
       
