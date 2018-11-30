@@ -84,14 +84,17 @@ public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
   @Override
   public GeoEvent process(GeoEvent ge) throws Exception {
 
+    LOG.debug(String.format("Received an event: %s", ge.toString()));
     try {
       if (!hasAllTags(ge, "GEOMETRY", "TRACK_ID", "VESSEL_TYPE", "VESSEL_BEARING", "VESSEL_BOW", "VESSEL_PORT", "VESSEL_STARBOARD", "VESSEL_STERN")) {
+        LOG.debug(String.format("Event rejected due to missing tag(s)."));
         return null;
       }
       
       MapGeometry geo = ge.getGeometry();
       SpatialReference srIn = geo.getSpatialReference();
       if (!(geo.getGeometry() instanceof Point)) {
+        LOG.debug(String.format("Event rejected due to missing geometry."));
         return null;
       }
       Point originGeo = (Point)geo.getGeometry();
@@ -104,6 +107,11 @@ public class VesselShapeGeneratorProcessor extends GeoEventProcessorBase {
       Double vesselStern = ge.getField("VESSEL_STERN") instanceof Number? ((Number)ge.getField("VESSEL_STERN")).doubleValue(): null;           // bottom
       Double vesselPort  = ge.getField("VESSEL_PORT") instanceof Number? ((Number)ge.getField("VESSEL_PORT")).doubleValue(): null;             // left
       Double vesselStar  = ge.getField("VESSEL_STARBOARD") instanceof Number? ((Number)ge.getField("VESSEL_STARBOARD")).doubleValue(): null;   // right
+      
+      if (vesselBow==null || vesselStern == null || vesselPort == null || vesselStar == null) {
+        LOG.debug(String.format("Event rejected due to missing dimensions."));
+        return null;
+      }
       
       // calculate vessel length and width
       double shipLength = vesselBow + vesselStern;
