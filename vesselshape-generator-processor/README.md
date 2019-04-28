@@ -1,9 +1,6 @@
-# Rangefan Calculator
+# Vessel Shape Generator for GeoEvent
 
-___This repository is no longer maintained___
-
-The Range fan Calculator generates a range fan originating at the input event's point location given a reange, traversal arc angle, and a bearing
-
+The Vessel Shape Generator generates shape of a vessel at the input event's point location given a set of parameters
 ![Image of Rangefan Processor](rangefans_390X150.png)
 
 
@@ -17,22 +14,22 @@ The Range fan Calculator generates a range fan originating at the input event's 
 
 ## Requirements
 
-* See common [solutions-geoevent-java requirements](../../../README.md#requirements).
+* See common [vesselshape-generator-for-geoevent requirements](../../../README.md#requirements).
 * The ArcGIS Runtime for Java SDK is required in order to run the standalone Maven Tests included with this project.
 
 ## Building 
 
-* See the [solutions-geoevent-java instructions](../../../README.md#instructions) for general instructions on 
+* See the [vesselshape-generator-for-geoevent instructions](../../../README.md#instructions) for general instructions on 
     * verifying your Maven installation
     * setting the location of GeoEvent Processor and GeoEvent Processor SDK repositories
     * and any other common required steps
-* Open a command prompt and navigate to `solutions-geoevent-java/solutions-geoevent/processors/rangefan-processor`
+* Open a command prompt and navigate to `vesselshape-generator-for-geoevent/vesselshape-generator/processors/vesselshape-generator`
     * Enter `mvn install` at the prompt.
 
 ## Installation
 
-* Install the Rangefan Processor.
-    * Browse to `solutions-geoevent-java/solutions-processors/rangefan-processor/target` (this directory is created when you execute mvn install).
+* Install the vesselshape-generator-for-geoevent.
+    * Browse to `vesselshape-generator-for-geoevent/vesselshape-generator/target` (this directory is created when you execute mvn install).
     * Copy the .jar file and paste it into the deploy folder in the GeoEvent Processor install directory ([GeoEvent Processor install location]\deploy\ -- default location is C:\Program Files\ArcGIS\Server\GeoEventProcessor\deploy).
 
 
@@ -40,8 +37,8 @@ The Range fan Calculator generates a range fan originating at the input event's 
 
 ### Validating the Installation
  
-* See the [solutions-geoevent-java validation instructions](../../../README.md#validating-install).
-    * Ensure the Range Fan Calculator exists.
+* See the [vesselshape-generator-for-geoevent validation instructions](../../../README.md#validating-install).
+    * Ensure the vesselshape-generator-for-geoevent exists.
 
 ### Testing with Simulated Test Data
 
@@ -54,8 +51,8 @@ In GeoEvent Extension Manager
 * Go to the Site >> Configuration Store Tab. 
 * Click the 'Import Configuration' button. 
 * Select 'Choose File'
-* Browse to the ./solutions-geoevent-java/data/configurations/ directory 
-* Select the SolutionsComponentTestConfig.xml 
+* Browse to the ./vesselshape-generator-for-geoevent directory 
+* Select the TestConfig.xml 
 * Click 'Open' in the dialog. 
 * Click 'Next'. 
 * When prompted choose 'Import Configuration'. 
@@ -68,17 +65,17 @@ The test service configuration will be deployed to your instance of GeoEvent.
 
 The Introduction to GeoEvent tutorial has a simple TCP-Console application that will be used for most of the tests. It can be found [here](http://www.arcgis.com/home/item.html?id=b6a35042effd44ceab3976941d36efcf).
 
-You will use the RangeFan-Test service from the Solutions Test Configuration to test the functionality of the Range Fan Calculator.
-* Open the RangeFan-Test service in GEE Manager. 
-* Click on the rangefan-tcp-txt-in Input and expand the 'Advanced' tab. Note that the input uses TCP port 5606.
+You will use the AIS-Test service from the Solutions Test Configuration to test the functionality of the Range Fan Calculator.
+* Open the AIS-Test service in GEE Manager. 
+* Click on the ais-tcp-txt-in Input and expand the 'Advanced' tab. Note that the input uses TCP port 5606.
 * Open the ArcGIS GeoEvent Simulator (this is installed with GeoEvent Extension and can be found at the GeoEvent Extension install location).
 * Make sure the Server points to the server on which GeoEvent Extension is deployed (default is local host).
 * In the upper right, change the port to 5606 and  click the button with the red X to connect (Note: if you cannot connect the server is not listening on that port. This may be because the Input in GeoEvent extension has not been started).
 * Make sure 'File' is selected in the combo box on the upper left.
 * Click the 'Load File' button in the upper right.
 * In the new dialog, click the file folder button in the upper right.
-* Browse to the ./solutions-geoevent-java/data/simulation-files/ directory.
-* Select rangefan.csv and click 'Open'
+* Browse to the ./vesselshape-generator-for-geoevent/data/simulation-files/ directory.
+* Select ais.csv and click 'Open'
 * Click the 'Load' button. In the Preview Edits window you will see 1 record.
 * Browse to the directory of the TCP-Console application (if you downloaded it from the tutorial it will be at ./IntroductionToGeoEvent/utilities/tcp-server-app).
 * Double click TCPServerApp.bat (the application will not start if no services are listening on port 5570 - if you have deployed the test configuration an output service has been configured to listen on this port. Check that the Output tcp-out-5570 has been deployed and started).
